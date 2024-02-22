@@ -1,18 +1,22 @@
+import { APIEvent } from "@solidjs/start/server/types";
 import { Server } from "socket.io";
+import { SocketWithIO, sServer } from "~/types/socket";
 
-export async function GET({ request, httpServer }) {
-  if (httpServer.io) {
+export async function GET({ request, nativeEvent }: APIEvent) {
+  const socket = nativeEvent.node.res.socket as SocketWithIO | null;
+  if (!socket) return;
+  if (socket.server.io) {
     console.log("Socket is already running " + request.url, request);
   } else {
     console.log("Initializing Socket");
 
-    const io = new Server(httpServer, {
-      path: "/api/socket",
+    const io: sServer = new Server(socket.server, {
+      path: "/api/ws",
     });
 
-    httpServer.io = io;
+    socket.server.io = io;
 
-    const users = {};
+    const users: Record<string, string> = {};
 
     io.on("connection", (socket) => {
       socket.on("new-user", (name) => {
