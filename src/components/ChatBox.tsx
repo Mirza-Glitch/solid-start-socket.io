@@ -1,10 +1,10 @@
-import { createSignal, createEffect, onMount } from "solid-js";
+import { createSignal, onMount, For } from "solid-js";
 import { createStore } from "solid-js/store";
 import { socket } from "~/lib/socket";
 
 export default function ChatBox() {
   const [messageInput, setMessageInput] = createSignal("");
-  const [messages, setMessages] = createStore([]);
+  const [messages, setMessages] = createStore<string[]>([]);
 
   onMount(() => {
     askUserName();
@@ -20,7 +20,8 @@ export default function ChatBox() {
     });
   });
 
-  const appendMessage = (message) => setMessages(messages.length, message);
+  const appendMessage = (message: string) =>
+    setMessages(messages.length, message);
 
   const askUserName = () => {
     let myName = prompt("What is your name?");
@@ -31,7 +32,7 @@ export default function ChatBox() {
     }
   };
 
-  const handleInput = (e) => {
+  const handleInput = (e: Event) => {
     e.preventDefault();
     const message = messageInput();
     appendMessage(`You: ${message}`);
